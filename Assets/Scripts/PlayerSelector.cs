@@ -1,9 +1,19 @@
-using System;
 using Unity.Netcode;
 
 public class PlayerSelector : NetworkBehaviour
 {
-    private bool isHostTurn=true;
+    public static PlayerSelector Instance;
+
+    private bool isHostTurn = true;
+    public bool IsHostTurn => isHostTurn;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
     public override void OnNetworkSpawn()
     {
         NetworkManager.OnServerStarted += NetworkManager_OnServerStarted;
@@ -33,7 +43,7 @@ public class PlayerSelector : NetworkBehaviour
                 break;
         }
     }
-   
+
     private void Initialize()
     {
         PlayerStateManager[] playerStateManagers = FindObjectsOfType<PlayerStateManager>();

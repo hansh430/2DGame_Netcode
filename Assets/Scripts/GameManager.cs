@@ -57,6 +57,12 @@ public class GameManager : NetworkBehaviour
         NetworkManager.OnServerStarted -= NetworkManager_OnServerStarted;
         NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
     }
+
+    public void SetGameState(GameState state)
+    {
+        this.gameState = state;
+        OnGameStateChangesd?.Invoke(gameState);
+    }
 }
 public enum GameState
 {
