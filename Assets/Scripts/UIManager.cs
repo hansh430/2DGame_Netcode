@@ -1,4 +1,5 @@
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -90,8 +91,11 @@ public class UIManager : MonoBehaviour
     }
     private void OnClickClientButton()
     {
-        ShowWaitingPanel();
+        string ipAddress = IPManager.Instance.InputIP;
+        UnityTransport utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        utp.SetConnectionData(ipAddress, 7777);
         NetworkManager.Singleton.StartClient();
+        ShowWaitingPanel();
     }
     private void OnClickWinNextButton()
     {

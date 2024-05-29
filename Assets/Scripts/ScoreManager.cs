@@ -97,12 +97,12 @@ public class ScoreManager : NetworkBehaviour
 
     private void ClientWin()
     {
-        HostWinClientRPC();
+        ClientWinClientRPC();
     }
 
     private void Hostwin()
     {
-        ClientWinClientRPC();
+        HostWinClientRPC();
     }
 
     [ClientRpc]
