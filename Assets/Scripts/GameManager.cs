@@ -1,5 +1,6 @@
 using System;
 using Unity.Netcode;
+using UnityEngine;
 
 public class GameManager : NetworkBehaviour
 {
@@ -7,7 +8,7 @@ public class GameManager : NetworkBehaviour
     public static Action<GameState> OnGameStateChangesd;
 
     private GameState gameState;
-    private int connectedPlayers;
+    [SerializeField] private int connectedPlayers;
 
     private void Awake()
     {
@@ -25,7 +26,6 @@ public class GameManager : NetworkBehaviour
         if (!IsServer)
             return;
 
-        connectedPlayers++;
         NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
     }
 

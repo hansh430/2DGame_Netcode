@@ -1,5 +1,4 @@
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,6 +13,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject gamePanel;
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject losePanel;
+    [SerializeField] private GameObject joinPanel;
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
     [SerializeField] private Button winNextButton;
@@ -63,11 +63,13 @@ public class UIManager : MonoBehaviour
         gamePanel.SetActive(false);
         winPanel.SetActive(false);
         losePanel.SetActive(false);
+        joinPanel.SetActive(false);
     }
     private void ShowWaitingPanel()
     {
         waitingPanel.SetActive(true);
         connectionPanel.SetActive(false);
+        joinPanel.SetActive(false);
         gamePanel.SetActive(false);
     }
     private void ShowGamePanel()
@@ -75,6 +77,7 @@ public class UIManager : MonoBehaviour
         gamePanel.SetActive(true);
         connectionPanel.SetActive(false);
         waitingPanel.SetActive(false);
+        joinPanel.SetActive(false);
     }
     private void ShowWinPanel()
     {
@@ -86,15 +89,20 @@ public class UIManager : MonoBehaviour
     }
     private void OnClickHostButton()
     {
+        // NetworkManager.Singleton.StartHost();
+        RelayManager.Instance.StartCoroutine(RelayManager.Instance.ConfigureTransportAndStartNgoAsHost());
         ShowWaitingPanel();
-        NetworkManager.Singleton.StartHost();
     }
     private void OnClickClientButton()
     {
-        string ipAddress = IPManager.Instance.InputIP;
-        UnityTransport utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        utp.SetConnectionData(ipAddress, 7777);
-        NetworkManager.Singleton.StartClient();
+        //with lan
+        /*  string ipAddress = IPManager.Instance.InputIP;
+          UnityTransport utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
+          utp.SetConnectionData(ipAddress, 7777);
+          NetworkManager.Singleton.StartClient();*/
+
+        // with relay
+        RelayManager.Instance.StartCoroutine(RelayManager.Instance.ConfigureTransportAndStartNgoAsConnectingPlayer());
         ShowWaitingPanel();
     }
     private void OnClickWinNextButton()

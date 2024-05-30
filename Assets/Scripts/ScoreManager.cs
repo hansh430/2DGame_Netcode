@@ -81,11 +81,11 @@ public class ScoreManager : NetworkBehaviour
     }
     private void CheckForEndGame()
     {
-        if (hostScore >= 3)
+        if (hostScore >= 5)
         {
             Hostwin();
         }
-        else if (clientScore >= 3)
+        else if (clientScore >= 5)
         {
             ClientWin();
         }
