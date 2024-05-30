@@ -21,6 +21,8 @@ public class RelayManager : NetworkBehaviour
     [SerializeField] private TMP_Text joinCodeText;
     [SerializeField] private TMP_InputField joinCodeInputField;
 
+    public Action WaitingErrorAction;
+    public Action WaitingSuccessAction;
     private void Awake()
     {
         if (Instance == null)
@@ -119,11 +121,13 @@ public class RelayManager : NetworkBehaviour
         var clientRelayUtilityTask = JoinRelayServerFromJoinCode(joinCodeInputField.text);
         while (!clientRelayUtilityTask.IsCompleted)
         {
+            WaitingSuccessAction?.Invoke();
             yield return null;
         }
         if (clientRelayUtilityTask.IsFaulted)
         {
             Debug.LogError("Exception thrown when attempting to connet to Relay server. Exception: " + clientRelayUtilityTask.Exception.Message);
+            WaitingErrorAction?.Invoke();
             yield break;
         }
 

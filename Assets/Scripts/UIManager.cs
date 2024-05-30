@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button winNextButton;
     [SerializeField] private Button loseNextButton;
 
+    public Button ClientButton => clientButton;
     private void Awake()
     {
         if (Instance == null)
@@ -31,6 +32,8 @@ public class UIManager : MonoBehaviour
         ShowConnectionPanel();
 
         GameManager.OnGameStateChangesd += GameStateChangedCallback;
+        RelayManager.Instance.WaitingErrorAction += ShowJoinPanel;
+        RelayManager.Instance.WaitingSuccessAction += ShowWaitingPanel;
         hostButton.onClick.AddListener(OnClickHostButton);
         clientButton.onClick.AddListener(OnClickClientButton);
         winNextButton.onClick.AddListener(OnClickWinNextButton);
@@ -64,6 +67,15 @@ public class UIManager : MonoBehaviour
         winPanel.SetActive(false);
         losePanel.SetActive(false);
         joinPanel.SetActive(false);
+    }
+    private void ShowJoinPanel()
+    {
+        joinPanel.SetActive(true);
+        connectionPanel.SetActive(false);
+        waitingPanel.SetActive(false);
+        gamePanel.SetActive(false);
+        winPanel.SetActive(false);
+        losePanel.SetActive(false);
     }
     private void ShowWaitingPanel()
     {
@@ -103,21 +115,24 @@ public class UIManager : MonoBehaviour
 
         // with relay
         RelayManager.Instance.StartCoroutine(RelayManager.Instance.ConfigureTransportAndStartNgoAsConnectingPlayer());
-        ShowWaitingPanel();
     }
     private void OnClickWinNextButton()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         NetworkManager.Singleton.Shutdown();
+      //  GameManager.Instance.NextGame();
     }
     private void OnClickLoseNextButton()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         NetworkManager.Singleton.Shutdown();
+     //   GameManager.Instance.NextGame();
     }
     private void OnDestroy()
     {
         GameManager.OnGameStateChangesd -= GameStateChangedCallback;
+        RelayManager.Instance.WaitingErrorAction -= ShowJoinPanel;
+        RelayManager.Instance.WaitingSuccessAction -= ShowWaitingPanel;
         hostButton.onClick.RemoveAllListeners();
         clientButton.onClick.RemoveAllListeners();
         winNextButton.onClick.RemoveAllListeners();

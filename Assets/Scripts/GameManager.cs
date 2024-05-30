@@ -63,6 +63,11 @@ public class GameManager : NetworkBehaviour
         this.gameState = state;
         OnGameStateChangesd?.Invoke(gameState);
     }
+    public void NextGame()
+    {
+        EggManager.Instance.ReSpawnEgg();
+        gameState = GameState.Game;
+    }
 }
 public enum GameState
 {
