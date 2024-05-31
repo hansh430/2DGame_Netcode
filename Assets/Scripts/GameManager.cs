@@ -63,7 +63,8 @@ public class GameManager : NetworkBehaviour
         this.gameState = state;
         OnGameStateChangesd?.Invoke(gameState);
     }
-    public void NextGame()
+    [ClientRpc]
+    public void NextGameClientRPC()
     {
         EggManager.Instance.ReSpawnEgg();
         gameState = GameState.Game;

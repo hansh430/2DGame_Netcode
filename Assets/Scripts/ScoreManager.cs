@@ -109,21 +109,34 @@ public class ScoreManager : NetworkBehaviour
     private void HostWinClientRPC()
     {
         if (IsServer)
+        {
+            UIManager.Instance.WaitingForNextGame(false, true);
             GameManager.Instance.SetGameState(GameState.Win);
+        }
         else
+        {
+            UIManager.Instance.WaitingForNextGame(true, false);
             GameManager.Instance.SetGameState(GameState.Lose);
+        }
     }
 
     [ClientRpc]
     private void ClientWinClientRPC()
     {
         if (IsServer)
+        {
+            UIManager.Instance.WaitingForNextGame(false, true);
             GameManager.Instance.SetGameState(GameState.Lose);
+        }
         else
+        {
+            UIManager.Instance.WaitingForNextGame(true, false);
             GameManager.Instance.SetGameState(GameState.Win);
+        }
     }
     private void ReUseEgg()
     {
         EggManager.Instance.ReSpawnEgg();
     }
+
 }

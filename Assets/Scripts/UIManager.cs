@@ -1,9 +1,10 @@
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class UIManager : NetworkBehaviour
 {
     public static UIManager Instance;
 
@@ -14,10 +15,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject losePanel;
     [SerializeField] private GameObject joinPanel;
+    [SerializeField] private TMP_Text waitingText;
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
-    [SerializeField] private Button winNextButton;
-    [SerializeField] private Button loseNextButton;
+    [SerializeField] private Button nextButton;
 
     public Button ClientButton => clientButton;
     private void Awake()
@@ -36,8 +37,7 @@ public class UIManager : MonoBehaviour
         RelayManager.Instance.WaitingSuccessAction += ShowWaitingPanel;
         hostButton.onClick.AddListener(OnClickHostButton);
         clientButton.onClick.AddListener(OnClickClientButton);
-        winNextButton.onClick.AddListener(OnClickWinNextButton);
-        loseNextButton.onClick.AddListener(OnClickLoseNextButton);
+        nextButton.onClick.AddListener(OnClickWinNextButton);
     }
 
 
@@ -99,6 +99,7 @@ public class UIManager : MonoBehaviour
     {
         losePanel.SetActive(true);
     }
+
     private void OnClickHostButton()
     {
         // NetworkManager.Singleton.StartHost();
@@ -120,14 +121,9 @@ public class UIManager : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         NetworkManager.Singleton.Shutdown();
-      //  GameManager.Instance.NextGame();
+        //  GameManager.Instance.NextGameClientRPC();
     }
-    private void OnClickLoseNextButton()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        NetworkManager.Singleton.Shutdown();
-     //   GameManager.Instance.NextGame();
-    }
+
     private void OnDestroy()
     {
         GameManager.OnGameStateChangesd -= GameStateChangedCallback;
@@ -135,8 +131,11 @@ public class UIManager : MonoBehaviour
         RelayManager.Instance.WaitingSuccessAction -= ShowWaitingPanel;
         hostButton.onClick.RemoveAllListeners();
         clientButton.onClick.RemoveAllListeners();
-        winNextButton.onClick.RemoveAllListeners();
-        loseNextButton.onClick.RemoveAllListeners();
+        nextButton.onClick.RemoveAllListeners();
     }
-
+    public void WaitingForNextGame(bool textStatus, bool buttonStatus)
+    {
+        waitingText.gameObject.SetActive(textStatus);
+        nextButton.gameObject.SetActive(buttonStatus);
+    }
 }
