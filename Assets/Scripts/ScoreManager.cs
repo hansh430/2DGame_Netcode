@@ -4,11 +4,25 @@ using UnityEngine;
 
 public class ScoreManager : NetworkBehaviour
 {
+    public static ScoreManager Instance;
+
     [Header("Elements")]
     [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text targetScoreText;
+
     private int hostScore;
     private int clientScore;
+    private int targetScore = 3;
 
+    public int TargetScore { get { return targetScore; } set { targetScore = value; } }
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
     private void Start()
     {
         UpdateScoreText();
@@ -49,7 +63,7 @@ public class ScoreManager : NetworkBehaviour
         switch (state)
         {
             case GameState.Game:
-                ResetScore();
+                ResetScore(targetScore);
                 break;
         }
     }
@@ -67,25 +81,39 @@ public class ScoreManager : NetworkBehaviour
     }
 
     [ClientRpc]
+    private void UpdateTargetScoreClientRpc(int targetScore)
+    {
+        this.targetScore = targetScore;
+    }
+
+    [ClientRpc]
     private void UpdateScoreTextClientRpc()
     {
         scoreText.text = "<color=#0055ffff>" + hostScore + "</color> - <color=#ff5500ff>" + clientScore + "</color>";
     }
-    private void ResetScore()
+
+    [ClientRpc]
+    private void UpdateTargetScoreTextClientRpc()
+    {
+        targetScoreText.text = "" + targetScore;
+    }
+    public void ResetScore(int updatedScore)
     {
         hostScore = 0;
         clientScore = 0;
-
+        targetScore = updatedScore;
         UpdateScoreClientRpc(hostScore, clientScore);
+        UpdateTargetScoreClientRpc(targetScore);
+        UpdateTargetScoreTextClientRpc();
         UpdateScoreText();
     }
     private void CheckForEndGame()
     {
-        if (hostScore >= 5)
+        if (hostScore >= targetScore)
         {
             Hostwin();
         }
-        else if (clientScore >= 5)
+        else if (clientScore >= targetScore)
         {
             ClientWin();
         }

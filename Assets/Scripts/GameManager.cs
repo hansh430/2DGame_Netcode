@@ -8,6 +8,7 @@ public class GameManager : NetworkBehaviour
     public static Action<GameState> OnGameStateChangesd;
 
     private GameState gameState;
+    public GameState GameState { get { return gameState; } set { gameState = value; } }
     [SerializeField] private int connectedPlayers;
 
     private void Awake()
@@ -63,13 +64,8 @@ public class GameManager : NetworkBehaviour
         this.gameState = state;
         OnGameStateChangesd?.Invoke(gameState);
     }
-    [ClientRpc]
-    public void NextGameClientRPC()
-    {
-        EggManager.Instance.ReSpawnEgg();
-        gameState = GameState.Game;
-    }
 }
+
 public enum GameState
 {
     Menu, Game, Win, Lose

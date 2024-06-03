@@ -1,7 +1,6 @@
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : NetworkBehaviour
@@ -15,10 +14,10 @@ public class UIManager : NetworkBehaviour
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject losePanel;
     [SerializeField] private GameObject joinPanel;
-    [SerializeField] private TMP_Text waitingText;
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
     [SerializeField] private Button nextButton;
+    [SerializeField] private TMP_Text waitingText;
 
     public Button ClientButton => clientButton;
     private void Awake()
@@ -37,7 +36,7 @@ public class UIManager : NetworkBehaviour
         RelayManager.Instance.WaitingSuccessAction += ShowWaitingPanel;
         hostButton.onClick.AddListener(OnClickHostButton);
         clientButton.onClick.AddListener(OnClickClientButton);
-        nextButton.onClick.AddListener(OnClickWinNextButton);
+        nextButton.onClick.AddListener(OnClickNextButton);
     }
 
 
@@ -117,14 +116,37 @@ public class UIManager : NetworkBehaviour
         // with relay
         RelayManager.Instance.StartCoroutine(RelayManager.Instance.ConfigureTransportAndStartNgoAsConnectingPlayer());
     }
-    private void OnClickWinNextButton()
+    private void OnClickNextButton()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        NetworkManager.Singleton.Shutdown();
-        //  GameManager.Instance.NextGameClientRPC();
+        if (IsServer)
+        {
+            NextButtonClientRPC();
+        }
+        else
+        {
+            NextButtonServerRPC();
+        }
+    }
+    [ClientRpc]
+    public void NextButtonClientRPC()
+    {
+        Debug.Log("Next button clicked");
+        winPanel.SetActive(false);
+        losePanel.SetActive(false);
+        waitingPanel.SetActive(false);
+        waitingText.gameObject.SetActive(false);
+        nextButton.gameObject.SetActive(false);
+        EggManager.Instance.ReSpawnEgg();
+        GameManager.Instance.GameState = GameState.Game;
+        ScoreManager.Instance.ResetScore(ScoreManager.Instance.TargetScore + 5);
     }
 
-    private void OnDestroy()
+    [ServerRpc(RequireOwnership = false)]
+    private void NextButtonServerRPC()
+    {
+        NextButtonClientRPC();
+    }
+    public override void OnDestroy()
     {
         GameManager.OnGameStateChangesd -= GameStateChangedCallback;
         RelayManager.Instance.WaitingErrorAction -= ShowJoinPanel;
