@@ -1,5 +1,6 @@
 using TMPro;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,6 +35,7 @@ public class UIManager : NetworkBehaviour
         GameManager.OnGameStateChangesd += GameStateChangedCallback;
         RelayManager.Instance.WaitingErrorAction += ShowJoinPanel;
         RelayManager.Instance.WaitingSuccessAction += ShowWaitingPanel;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
         hostButton.onClick.AddListener(OnClickHostButton);
         clientButton.onClick.AddListener(OnClickClientButton);
         nextButton.onClick.AddListener(OnClickNextButton);
@@ -101,8 +103,8 @@ public class UIManager : NetworkBehaviour
 
     private void OnClickHostButton()
     {
-        // NetworkManager.Singleton.StartHost();
-        RelayManager.Instance.StartCoroutine(RelayManager.Instance.ConfigureTransportAndStartNgoAsHost());
+        CleanupNetwork();
+        StartCoroutine(RelayManager.Instance.ConfigureTransportAndStartNgoAsHost());
         ShowWaitingPanel();
     }
     private void OnClickClientButton()
@@ -114,7 +116,8 @@ public class UIManager : NetworkBehaviour
           NetworkManager.Singleton.StartClient();*/
 
         // with relay
-        RelayManager.Instance.StartCoroutine(RelayManager.Instance.ConfigureTransportAndStartNgoAsConnectingPlayer());
+        CleanupNetwork();
+        StartCoroutine(RelayManager.Instance.ConfigureTransportAndStartNgoAsConnectingPlayer());
     }
     private void OnClickNextButton()
     {
@@ -146,11 +149,25 @@ public class UIManager : NetworkBehaviour
     {
         NextButtonClientRPC();
     }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        if (IsServer)
+            HandleClientDisconnection(clientId);
+    }
+
+    private void HandleClientDisconnection(ulong clientId)
+    {
+        EggManager.Instance.DeSpawnEgg();
+        ShowConnectionPanel();
+    }
+
     public override void OnDestroy()
     {
         GameManager.OnGameStateChangesd -= GameStateChangedCallback;
         RelayManager.Instance.WaitingErrorAction -= ShowJoinPanel;
         RelayManager.Instance.WaitingSuccessAction -= ShowWaitingPanel;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
         hostButton.onClick.RemoveAllListeners();
         clientButton.onClick.RemoveAllListeners();
         nextButton.onClick.RemoveAllListeners();
@@ -159,5 +176,18 @@ public class UIManager : NetworkBehaviour
     {
         waitingText.gameObject.SetActive(textStatus);
         nextButton.gameObject.SetActive(buttonStatus);
+    }
+    private void CleanupNetwork()
+    {
+        if (NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsClient)
+        {
+            NetworkManager.Singleton.Shutdown();
+            ResetTransport();
+        }
+    }
+    private void ResetTransport()
+    {
+        var unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        unityTransport.SetConnectionData("0.0.0.0", 0);
     }
 }

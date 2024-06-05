@@ -51,4 +51,14 @@ public class EggManager : NetworkBehaviour
 
         transform.GetChild(0).GetComponent<Egg>().Reuse();
     }
+    public void DeSpawnEgg()
+    {
+        if (!IsServer)
+            return;
+
+        if (transform.childCount <= 0)
+            return;
+
+        transform.GetChild(0).GetComponent<Egg>().GetComponent<NetworkObject>().Despawn();
+    }
 }

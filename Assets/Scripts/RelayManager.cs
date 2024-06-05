@@ -94,7 +94,7 @@ public class RelayManager : NetworkBehaviour
         var relayServerData = serverRelayUtilityTask.Result;
 
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-        Debug.Log("Coonection Data: " + relayServerData.ConnectionData);
+        Debug.Log("Connection Data: " + relayServerData.ConnectionData);
         NetworkManager.Singleton.StartHost();
         yield return null;
     }

@@ -8,9 +8,11 @@ public class GameManager : NetworkBehaviour
     public static Action<GameState> OnGameStateChangesd;
 
     private GameState gameState;
-    public GameState GameState { get { return gameState; } set { gameState = value; } }
+
     [SerializeField] private int connectedPlayers;
 
+    public GameState GameState { get { return gameState; } set { gameState = value; } }
+    public int ConnectedPlayer { get { return connectedPlayers; } set { connectedPlayers = value; } }
     private void Awake()
     {
         if (Instance == null)
@@ -28,15 +30,21 @@ public class GameManager : NetworkBehaviour
             return;
 
         NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisConnectedCallback;
     }
 
     private void Singleton_OnClientConnectedCallback(ulong obj)
     {
+        Debug.Log("This is called");
         connectedPlayers++;
         if (connectedPlayers >= 2)
             StartGame();
     }
-
+    private void Singleton_OnClientDisConnectedCallback(ulong obj)
+    {
+        connectedPlayers = 0;
+        RemoveEvents();
+    }
     private void StartGame()
     {
         StartGameClientRpc();
@@ -53,12 +61,13 @@ public class GameManager : NetworkBehaviour
     {
         gameState = GameState.Menu;
     }
-    public override void OnDestroy()
+
+    private void RemoveEvents()
     {
         NetworkManager.OnServerStarted -= NetworkManager_OnServerStarted;
         NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisConnectedCallback;
     }
-
     public void SetGameState(GameState state)
     {
         this.gameState = state;
