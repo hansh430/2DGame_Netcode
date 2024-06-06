@@ -30,6 +30,12 @@ public class ScoreManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         NetworkManager.OnServerStarted += NetworkManager_OnServerStarted;
+        NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisConnectedCallback;
+    }
+
+    private void Singleton_OnClientDisConnectedCallback(ulong obj)
+    {
+        RemoveAllEvents();
     }
 
     private void NetworkManager_OnServerStarted()
@@ -41,12 +47,14 @@ public class ScoreManager : NetworkBehaviour
         GameManager.OnGameStateChangesd += GameStateChangedCallback;
     }
 
-    public override void OnDestroy()
+    private void RemoveAllEvents()
     {
-        NetworkManager.OnServerStarted -= NetworkManager_OnServerStarted;
         Egg.OnFellInWater -= EggFellInWaterCallback;
         GameManager.OnGameStateChangesd -= GameStateChangedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisConnectedCallback;
+        NetworkManager.OnServerStarted -= NetworkManager_OnServerStarted;
     }
+
     private void EggFellInWaterCallback()
     {
         if (PlayerSelector.Instance.IsHostTurn)

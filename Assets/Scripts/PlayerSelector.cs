@@ -24,15 +24,16 @@ public class PlayerSelector : NetworkBehaviour
         if (!IsServer)
             return;
         GameManager.OnGameStateChangesd += GameStateChangedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisConnectedCallback;
         Egg.OnHit += SwitchPlayers;
     }
 
-
-    public override void OnDestroy()
+    private void Singleton_OnClientDisConnectedCallback(ulong obj)
     {
         NetworkManager.OnServerStarted -= NetworkManager_OnServerStarted;
         GameManager.OnGameStateChangesd -= GameStateChangedCallback;
         Egg.OnHit -= SwitchPlayers;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisConnectedCallback;
     }
     private void GameStateChangedCallback(GameState state)
     {
