@@ -71,5 +71,6 @@ public class PlayerSelector : NetworkBehaviour
     {
         isHostTurn = !isHostTurn;
         Initialize();
+        AudioManager.Instance.PlayAudioClientRpc("JumpAudio");
     }
 }

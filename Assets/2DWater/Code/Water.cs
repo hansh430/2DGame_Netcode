@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Bundos.WaterSystem
@@ -8,7 +9,7 @@ namespace Bundos.WaterSystem
     }
 
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-    public class Water : MonoBehaviour
+    public class Water : NetworkBehaviour
     {
         [Header("Dynamic Wave Settings")]
         public bool interactive = true;
@@ -187,7 +188,8 @@ namespace Bundos.WaterSystem
             mesh.RecalculateNormals();
         }
 
-        private void Ripple(Vector3 contactPoint, bool sink)
+        [ClientRpc]
+        private void RippleClientRPC(Vector3 contactPoint, bool sink)
         {
             Instantiate(splashParticle, contactPoint, Quaternion.identity);
 
@@ -218,7 +220,7 @@ namespace Bundos.WaterSystem
             {
                 Vector2 contactPoint = other.ClosestPoint(transform.position);
 
-                Ripple(contactPoint, false);
+                RippleClientRPC(contactPoint, false);
             }
         }
 
@@ -231,7 +233,7 @@ namespace Bundos.WaterSystem
             if (otherRigidbody != null)
             {
                 Vector2 contactPoint = other.ClosestPoint(transform.position);
-                Ripple(contactPoint, true);
+                RippleClientRPC(contactPoint, true);
             }
         }
     }

@@ -65,6 +65,7 @@ public class ScoreManager : NetworkBehaviour
         UpdateScoreClientRpc(hostScore, clientScore);
         UpdateScoreText();
         CheckForEndGame();
+        AudioManager.Instance.PlayAudioClientRpc("SplashAudio");
     }
     private void GameStateChangedCallback(GameState state)
     {
