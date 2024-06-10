@@ -18,6 +18,7 @@ public class UIManager : NetworkBehaviour
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
     [SerializeField] private Button nextButton;
+    [SerializeField] private Button closeButton;
     [SerializeField] private TMP_Text waitingText;
 
     public Button ClientButton => clientButton;
@@ -39,8 +40,13 @@ public class UIManager : NetworkBehaviour
         hostButton.onClick.AddListener(OnClickHostButton);
         clientButton.onClick.AddListener(OnClickClientButton);
         nextButton.onClick.AddListener(OnClickNextButton);
+        closeButton.onClick.AddListener(ONClickCloseButton);
     }
 
+    private void ONClickCloseButton()
+    {
+        Application.Quit();
+    }
 
     private void GameStateChangedCallback(GameState state)
     {
@@ -171,6 +177,7 @@ public class UIManager : NetworkBehaviour
         hostButton.onClick.RemoveAllListeners();
         clientButton.onClick.RemoveAllListeners();
         nextButton.onClick.RemoveAllListeners();
+        closeButton.onClick.RemoveAllListeners();
     }
     public void WaitingForNextGame(bool textStatus, bool buttonStatus)
     {
